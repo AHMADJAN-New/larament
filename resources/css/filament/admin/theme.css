@@ -1,7 +1,12 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap');
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+:root {
+    font-family: 'Noto Naskh Arabic', sans-serif;
+}
 
 .fi-sidebar-nav {
     border-right: 1px solid #e4e4e5;
@@ -9,4 +14,16 @@
 
 .dark .fi-sidebar-nav {
     border-right: 1px solid  #18181B;
+}
+
+.fi-body {
+    direction: rtl;
+}
+
+.fi-sidebar {
+    direction: rtl;
+}
+
+.fi-topbar {
+    direction: rtl;
 }

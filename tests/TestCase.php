@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
@@ -15,6 +16,7 @@ abstract class TestCase extends BaseTestCase
             'name' => config('app.default_user.name'),
             'email' => config('app.default_user.email'),
             'password' => config('app.default_user.password'),
+            'role' => UserRole::Admin->value,
         ]));
 
         $this->withoutVite();

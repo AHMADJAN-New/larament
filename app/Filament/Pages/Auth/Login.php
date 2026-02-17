@@ -8,6 +8,11 @@ use Filament\Auth\Pages\Login as BasePage;
 
 final class Login extends BasePage
 {
+    public function getHeading(): string
+    {
+        return 'سیسټم ته ننوتل';
+    }
+
     public function mount(): void
     {
         parent::mount();

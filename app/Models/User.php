@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
@@ -11,13 +12,25 @@ use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use ValueError;
 
 final class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -33,8 +46,54 @@ final class User extends Authenticatable implements FilamentUser, HasAppAuthenti
 
     public function canAccessPanel(Panel $panel): bool
     {
-        /* TODO: Please implement your own logic here. */
-        return true; // str_ends_with($this->email, '@larament.test');
+        return in_array($this->getRole()->value, array_column(UserRole::cases(), 'value'), true);
+    }
+
+    public function getRole(): UserRole
+    {
+        if ($this->role instanceof UserRole) {
+            return $this->role;
+        }
+
+        if (! filled($this->role)) {
+            return UserRole::Member;
+        }
+
+        try {
+            return UserRole::from((string) $this->role);
+        } catch (ValueError) {
+            return UserRole::Member;
+        }
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->getRole()->canManageUsers();
+    }
+
+    public function canManageMeetings(): bool
+    {
+        return $this->getRole()->canManageMeetings();
+    }
+
+    public function canManageTemplates(): bool
+    {
+        return $this->getRole()->canManageTemplates();
+    }
+
+    public function canEditAnyTask(): bool
+    {
+        return $this->getRole()->canEditAnyTask();
+    }
+
+    public function meetingsCreated(): HasMany
+    {
+        return $this->hasMany(Meeting::class, 'created_by');
+    }
+
+    public function tasksCreated(): HasMany
+    {
+        return $this->hasMany(MeetingTask::class, 'created_by');
     }
 
     public function getAppAuthenticationSecret(): ?string
@@ -77,6 +136,7 @@ final class User extends Authenticatable implements FilamentUser, HasAppAuthenti
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
             'app_authentication_secret' => 'encrypted',
             'app_authentication_recovery_codes' => 'encrypted:array',
         ];

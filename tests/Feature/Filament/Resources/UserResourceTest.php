@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -83,6 +84,7 @@ it('can create a user', function () {
         ->fillForm([
             'name' => $user->name,
             'email' => $user->email,
+            'role' => UserRole::Member->value,
             'password' => $user->password,
         ])
         ->call('create')
@@ -91,6 +93,7 @@ it('can create a user', function () {
     assertDatabaseHas(User::class, [
         'name' => $user->name,
         'email' => $user->email,
+        'role' => UserRole::Member->value,
     ]);
 });
 
@@ -104,6 +107,7 @@ it('can update a user', function () {
         ->fillForm([
             'name' => $newUserData->name,
             'email' => $newUserData->email,
+            'role' => UserRole::Viewer->value,
         ])
         ->call('save')
         ->assertNotified();
@@ -112,6 +116,7 @@ it('can update a user', function () {
         'id' => $user->id,
         'name' => $newUserData->name,
         'email' => $newUserData->email,
+        'role' => UserRole::Viewer->value,
     ]);
 });
 
