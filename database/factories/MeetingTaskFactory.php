@@ -23,11 +23,13 @@ final class MeetingTaskFactory extends Factory
      */
     public function definition(): array
     {
+        $dueDate = fake()->optional()->dateTimeBetween('today', '+30 days');
+
         return [
             'meeting_id' => Meeting::factory(),
             'title' => fake()->sentence(5),
             'owner' => fake()->name(),
-            'due_date' => fake()->optional()->dateTimeBetween('today', '+30 days')->format('Y-m-d'),
+            'due_date' => $dueDate?->format('Y-m-d'),
             'priority' => fake()->randomElement(TaskPriority::cases())->value,
             'status' => fake()->randomElement(TaskStatus::cases())->value,
             'description' => fake()->optional()->paragraph(),
