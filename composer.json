@@ -79,10 +79,10 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
-        "pest": "./vendor/bin/pest --parallel",
-        "rector": "./vendor/bin/rector process --ansi",
-        "pint": "./vendor/bin/pint",
-        "phpstan": "./vendor/bin/phpstan analyse",
+        "pest": "@php vendor/bin/pest --parallel",
+        "rector": "@php vendor/bin/rector process --ansi",
+        "pint": "@php vendor/bin/pint",
+        "phpstan": "@php vendor/bin/phpstan analyse",
         "review": [
             "@pint",
             "@rector",

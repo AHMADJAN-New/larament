@@ -12,6 +12,8 @@ use Filament\Support\Concerns\Configurable;
 use Filament\Tables\Columns\Column;
 use Filament\Tables\Filters\BaseFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -23,8 +25,15 @@ final class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configureLocalization();
         $this->configureTable();
         $this->translatableComponents();
+    }
+
+    private function configureLocalization(): void
+    {
+        App::setLocale('ps');
+        Date::setLocale('ps');
     }
 
     private function translatableComponents(): void

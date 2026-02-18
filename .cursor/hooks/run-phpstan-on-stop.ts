@@ -7,7 +7,7 @@ type StopHookInput = {
 
 const COMMAND = {
     tool: "phpstan",
-    cmd: "./vendor/bin/phpstan analyse --memory-limit=512M",
+    cmd: "php vendor/bin/phpstan analyse --memory-limit=512M",
 };
 
 async function parseInput(): Promise<StopHookInput> {

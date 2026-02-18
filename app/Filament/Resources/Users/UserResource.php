@@ -24,11 +24,34 @@ final class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static ?int $navigationSort = 20;
+
+    public static function getNavigationGroup(): string
+    {
+        return 'سیسټم';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'کاروونکي';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return 'کاروونکی';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'کاروونکي';
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return [
             'name',
             'email',
+            'role',
         ];
     }
 
