@@ -21,7 +21,6 @@ it('builds tasks-only WhatsApp text', function () {
     $message = app(MeetingShareMessageService::class)->build(
         meeting: $meeting->load('tasks'),
         variant: 'tasks_only',
-        shareUrl: 'https://example.test/share/meeting/token',
     );
 
     expect($message)->toContain('د مجلس کارونه');
@@ -40,7 +39,6 @@ it('builds absent-only WhatsApp text', function () {
     $message = app(MeetingShareMessageService::class)->build(
         meeting: $meeting,
         variant: 'absent_only',
-        shareUrl: 'https://example.test/share/meeting/token',
     );
 
     expect($message)->toContain('غیر حاضر غړي');

@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>د تعقيب راپور — {{ $meeting->meeting_no }}</title>
+    @include('pdf.partials.fonts-bahij')
     <style>
         * { box-sizing: border-box; }
 
         body {
-            font-family: "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
             direction: rtl;
             text-align: right;
             margin: 0;
@@ -28,6 +29,7 @@
             font-size: 22px;
             font-weight: 700;
             color: #0f172a;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
         }
 
         .meeting-title {
@@ -68,6 +70,7 @@
             font-weight: 700;
             color: #0f172a;
             margin: 1.25rem 0 0.6rem;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
         }
 
         table {
@@ -90,6 +93,11 @@
             color: #334155;
         }
 
+        .list-table .col-num {
+            width: 3rem;
+            text-align: center;
+        }
+
         .footer {
             border-top: 1px solid #e2e8f0;
             margin-top: 2rem;
@@ -105,13 +113,31 @@
     <p class="meeting-title">{{ $meeting->title }}</p>
     <div class="meta">
         <strong>شمېره:</strong> {{ $meeting->meeting_no }} ·
-        <strong>نېټه:</strong> {{ $meeting->date?->format('Y-m-d') }} ·
+        <strong>نېټه:</strong> {{ shamsi_date($meeting->date) }} ·
         <strong>وخت:</strong> {{ $meeting->time ?? '—' }} ·
         <strong>ځای:</strong> {{ $meeting->location ?? '—' }}
     </div>
 </div>
 
-@if(filled($meeting->followup_text))
+@php
+    $followupLines = collect(preg_split('/\r\n|\r|\n/', (string) ($meeting->followup_text ?? '')))
+        ->map(fn (string $line): string => trim($line))
+        ->filter()
+        ->values();
+@endphp
+@if($followupLines->isNotEmpty())
+    <p class="section-heading">عمومي تعقيب</p>
+    <table class="list-table">
+        <thead>
+            <tr><th class="col-num">شمېره</th><th>ګام / مطلب</th></tr>
+        </thead>
+        <tbody>
+            @foreach($followupLines as $i => $line)
+                <tr><td class="col-num">{{ $i + 1 }}</td><td>{{ $line }}</td></tr>
+            @endforeach
+        </tbody>
+    </table>
+@elseif(filled($meeting->followup_text))
     <div class="summary">
         <p class="summary-heading">عمومي تعقيب</p>
         {!! nl2br(e($meeting->followup_text)) !!}
@@ -136,7 +162,7 @@
             <td>{{ $loop->iteration }}</td>
             <td>{{ $task->title }}</td>
             <td>{{ $task->owner ?? '—' }}</td>
-            <td>{{ $task->due_date?->format('Y-m-d') ?? '—' }}</td>
+            <td>{{ shamsi_date($task->due_date) }}</td>
             <td>
                 @if($task->status instanceof \App\Enums\TaskStatus)
                     {{ $task->status->label() }}
@@ -155,7 +181,7 @@
 </table>
 
 <div class="footer">
-    د تعقيب راپور — شمېره {{ $meeting->meeting_no }} — {{ $meeting->date?->format('Y-m-d') }}
+    د تعقيب راپور — شمېره {{ $meeting->meeting_no }} — {{ shamsi_date($meeting->date) }}
 </div>
 </body>
 </html>

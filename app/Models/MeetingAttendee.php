@@ -56,10 +56,14 @@ final class MeetingAttendee extends Model
     {
         self::saving(function (MeetingAttendee $attendee): void {
             $userId = $attendee->getRawOriginal('user_id');
-            if ($userId && blank($attendee->name)) {
-                /** @var User|null $user */
-                $user = $attendee->user ?? User::query()->find($userId);
-                $attendee->name = $user !== null ? $user->name : '';
+            if (blank($attendee->name)) {
+                if ($userId) {
+                    /** @var User|null $user */
+                    $user = $attendee->user ?? User::query()->find($userId);
+                    $attendee->name = $user !== null ? $user->name : '';
+                } else {
+                    $attendee->name = '—';
+                }
             }
         });
     }

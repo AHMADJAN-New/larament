@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Meetings\Schemas;
 
 use App\Enums\AttendanceStatus;
+use App\Models\Meeting;
+use DateTimeInterface;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
@@ -21,6 +23,13 @@ final class MeetingInfolist
             ->components([
                 Section::make('د مجلس معلومات')
                     ->schema([
+                        TextEntry::make('complete_pdf_link')
+                            ->label('')
+                            ->state('بشپړ PDF')
+                            ->url(fn (Meeting $record): string => route('meetings.pdf.complete', $record))
+                            ->openUrlInNewTab()
+                            ->icon(Heroicon::DocumentText)
+                            ->iconColor('info'),
                         TextEntry::make('meeting_no')
                             ->label('د مجلس شمېره'),
                         TextEntry::make('title')
@@ -28,7 +37,7 @@ final class MeetingInfolist
                             ->weight('bold'),
                         TextEntry::make('date')
                             ->label('نېټه')
-                            ->date(),
+                            ->formatStateUsing(fn (\Carbon\Carbon|DateTimeInterface|string|null $state): string => shamsi_date($state)),
                         TextEntry::make('time')
                             ->label('وخت')
                             ->time(),
@@ -60,7 +69,7 @@ final class MeetingInfolist
                 Section::make('حاضري')
                     ->schema([
                         RepeatableEntry::make('attendees')
-                            ->label('ګډونوال')
+                            ->label('د مجلس غړي')
                             ->table([
                                 TableColumn::make('نوم'),
                                 TableColumn::make('حالت'),
@@ -98,7 +107,7 @@ final class MeetingInfolist
                                     ->placeholder('—'),
                                 TextEntry::make('due_date')
                                     ->label('وروستۍ نېټه')
-                                    ->date()
+                                    ->formatStateUsing(fn (\Carbon\Carbon|DateTimeInterface|string|null $state): string => shamsi_date($state))
                                     ->placeholder('—'),
                                 TextEntry::make('priority')
                                     ->label('اولویت')

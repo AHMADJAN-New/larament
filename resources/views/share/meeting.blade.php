@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>د مجلس شریکول — {{ $meeting->title }}</title>
     <style>
+        @font-face {
+            font-family: 'Bahij Nassim';
+            src: url('/fonts/Bahij Nassim-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Bahij Nassim';
+            src: url('/fonts/Bahij Nassim-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
         :root {
             --bg: #f0f4f8;
             --card: #fff;
@@ -21,7 +35,7 @@
         }
 
         body {
-            font-family: "Noto Naskh Arabic", "Segoe UI", sans-serif;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", "Segoe UI", sans-serif;
             direction: rtl;
             text-align: right;
             margin: 0;
@@ -260,7 +274,7 @@
         <div class="meta">
             <span><strong>شمېره:</strong> {{ $meeting->meeting_no }}</span>
             <span><strong>عنوان:</strong> {{ $meeting->title }}</span>
-            <span><strong>نېټه:</strong> {{ $meeting->date?->format('Y-m-d') }}</span>
+            <span><strong>نېټه:</strong> {{ shamsi_date($meeting->date) }}</span>
             <span><strong>ځای:</strong> {{ $meeting->location ?? '-' }}</span>
         </div>
         @if($meeting->is_confidential)
@@ -295,6 +309,7 @@
 
         <p class="card-desc" style="margin-top:1rem; margin-bottom:0;">د PDF فایلونو لپاره:</p>
         <div class="pdf-row">
+            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.complete', $shareLink->token) }}" target="_blank" rel="noopener">بشپړ PDF</a>
             <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.decisions', $shareLink->token) }}" target="_blank" rel="noopener">د پرېکړو PDF</a>
             <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.followup', $shareLink->token) }}" target="_blank" rel="noopener">د تعقيب PDF</a>
         </div>
@@ -318,7 +333,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $task->title }}</td>
                     <td>{{ $task->owner ?? '-' }}</td>
-                    <td>{{ $task->due_date?->format('Y-m-d') ?? '-' }}</td>
+                    <td>{{ shamsi_date($task->due_date) }}</td>
                     <td>
                         @if($task->status instanceof \App\Enums\TaskStatus)
                             {{ $task->status->label() }}

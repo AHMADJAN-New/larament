@@ -37,4 +37,17 @@ final class MeetingPdfController extends Controller
             downloadName: 'meeting-'.$meeting->meeting_no.'-followup.pdf',
         );
     }
+
+    public function complete(Meeting $meeting): Response
+    {
+        $this->authorize('view', $meeting);
+
+        $meeting->load(['attendees', 'tasks']);
+
+        return $this->chromePdfService->streamFromView(
+            view: 'pdf.meeting-complete',
+            data: ['meeting' => $meeting],
+            downloadName: 'meeting-'.$meeting->meeting_no.'-complete.pdf',
+        );
+    }
 }

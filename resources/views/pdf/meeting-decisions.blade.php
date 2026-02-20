@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>د مجلس پرېکړې — {{ $meeting->meeting_no }}</title>
+    @include('pdf.partials.fonts-bahij')
     <style>
         * { box-sizing: border-box; }
 
         body {
-            font-family: "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
             direction: rtl;
             text-align: right;
             margin: 0;
@@ -28,6 +29,7 @@
             font-size: 22px;
             font-weight: 700;
             color: #0f172a;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
         }
 
         .meeting-title {
@@ -56,15 +58,37 @@
             font-weight: 700;
             color: #0f172a;
             margin: 1.25rem 0 0.6rem;
+            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
         }
 
-        ol {
-            padding-right: 1.5rem;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 0.65rem;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 700;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .list-table .col-num {
+            width: 3rem;
+            text-align: center;
+        }
+
+        .empty-hint {
             margin: 0 0 1rem;
-        }
-
-        li {
-            margin-bottom: 0.6rem;
+            color: #64748b;
+            font-size: 12px;
         }
 
         .footer {
@@ -97,7 +121,7 @@
     <p class="meeting-title">{{ $meeting->title }}</p>
     <div class="meta">
         <div><strong>شمېره:</strong> {{ $meeting->meeting_no }}</div>
-        <div><strong>نېټه:</strong> {{ $meeting->date?->format('Y-m-d') }}</div>
+        <div><strong>نېټه:</strong> {{ shamsi_date($meeting->date) }}</div>
         <div><strong>وخت:</strong> {{ $meeting->time ?? '—' }}</div>
         <div><strong>ځای:</strong> {{ $meeting->location ?? '—' }}</div>
         <div><strong>ټول ګډونوال:</strong> {{ $meeting->attendees->count() }}</div>
@@ -106,19 +130,26 @@
 </div>
 
 <p class="section-heading">پرېکړې</p>
-<ol>
-    @forelse($decisionLines as $line)
-        <li>{{ $line }}</li>
-    @empty
-        <li>پرېکړه ثبت شوې نه ده.</li>
-    @endforelse
-</ol>
+@if($decisionLines->isNotEmpty())
+    <table class="list-table">
+        <thead>
+            <tr><th class="col-num">شمېره</th><th>پرېکړه</th></tr>
+        </thead>
+        <tbody>
+            @foreach($decisionLines as $i => $line)
+                <tr><td class="col-num">{{ $i + 1 }}</td><td>{{ $line }}</td></tr>
+            @endforeach
+        </tbody>
+    </table>
+@else
+    <p class="empty-hint">پرېکړه ثبت شوې نه ده.</p>
+@endif
 
 <div class="footer">
     @if($meeting->is_confidential)
         <span class="confidential">دا سند محرم دی، د غیر مجاز شریکولو اجازه نشته.</span>
     @else
-        د مجلس پرېکړې — شمېره {{ $meeting->meeting_no }} — {{ $meeting->date?->format('Y-m-d') }}
+        د مجلس پرېکړې — شمېره {{ $meeting->meeting_no }} — {{ shamsi_date($meeting->date) }}
     @endif
 </div>
 </body>

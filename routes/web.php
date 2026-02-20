@@ -13,6 +13,8 @@ Route::middleware('auth')->group(function (): void {
         ->name('meetings.pdf.decisions');
     Route::get('/meetings/{meeting}/pdf/followup', [MeetingPdfController::class, 'followup'])
         ->name('meetings.pdf.followup');
+    Route::get('/meetings/{meeting}/pdf/complete', [MeetingPdfController::class, 'complete'])
+        ->name('meetings.pdf.complete');
     Route::get('/meetings/{meeting}/share/create', [MeetingShareController::class, 'create'])
         ->name('meetings.share.create');
 });
@@ -23,3 +25,5 @@ Route::get('/share/meeting/{token}/pdf/decisions', [MeetingShareController::clas
     ->name('meetings.share.pdf.decisions');
 Route::get('/share/meeting/{token}/pdf/followup', [MeetingShareController::class, 'followup'])
     ->name('meetings.share.pdf.followup');
+Route::get('/share/meeting/{token}/pdf/complete', [MeetingShareController::class, 'complete'])
+    ->name('meetings.share.pdf.complete');

@@ -7,10 +7,12 @@ namespace App\Filament\Resources\MeetingTasks\Tables;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\MeetingTask;
+use DateTimeInterface;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -26,22 +28,27 @@ final class MeetingTasksTable
             ->columns([
                 TextColumn::make('title')
                     ->label('موضوع/دنده')
+                    ->alignment(Alignment::Center)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('meeting.title')
                     ->label('مجلس')
+                    ->alignment(Alignment::Center)
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('owner')
                     ->label('مسؤل')
+                    ->alignment(Alignment::Center)
                     ->searchable(),
                 TextColumn::make('due_date')
                     ->label('وروستۍ نېټه')
-                    ->date()
+                    ->alignment(Alignment::Center)
+                    ->formatStateUsing(fn (\Carbon\Carbon|DateTimeInterface|string|null $state): string => shamsi_date($state))
                     ->sortable()
                     ->color(fn (MeetingTask $record): ?string => $record->is_overdue ? 'danger' : null),
                 TextColumn::make('priority')
                     ->label('اولویت')
+                    ->alignment(Alignment::Center)
                     ->badge()
                     ->formatStateUsing(function (TaskPriority|string $state): string {
                         $priority = $state instanceof TaskPriority ? $state : TaskPriority::from($state);
@@ -59,6 +66,7 @@ final class MeetingTasksTable
                     }),
                 TextColumn::make('status')
                     ->label('حالت')
+                    ->alignment(Alignment::Center)
                     ->badge()
                     ->formatStateUsing(function (TaskStatus|string $state): string {
                         $status = $state instanceof TaskStatus ? $state : TaskStatus::from($state);
@@ -77,6 +85,7 @@ final class MeetingTasksTable
                     }),
                 TextColumn::make('updated_at')
                     ->label('وروستی بدلون')
+                    ->alignment(Alignment::Center)
                     ->since()
                     ->toggleable(),
             ])

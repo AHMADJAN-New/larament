@@ -1,40 +1,328 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
-@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap');
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 
-:root {
-    font-family: 'Noto Naskh Arabic', sans-serif;
+@font-face {
+    font-family: 'Bahij Nassim';
+    src: url('/fonts/Bahij Nassim-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
 }
 
+@font-face {
+    font-family: 'Bahij Nassim';
+    src: url('/fonts/Bahij Nassim-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    font-family: 'Bahij Nassim', 'Noto Naskh Arabic', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Bahij Nassim', 'Noto Naskh Arabic', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Larger base font size for labels, fields, and UI text */
+html.fi {
+    font-size: 18px;
+}
+
+/* Sidebar: larger text, colored icons, improved design */
 .fi-sidebar-nav {
-    border-right: 1px solid #e4e4e5;
+    border-inline-end: 1px solid #e4e4e5;
+    padding-inline: 1rem;
+    gap: 1.75rem;
 }
 
 .dark .fi-sidebar-nav {
-    border-right: 1px solid  #18181B;
+    border-inline-end: 1px solid #18181B;
 }
 
-.fi-body {
-    direction: rtl;
+.fi-sidebar-nav-groups {
+    gap: 1.75rem;
 }
 
-.fi-sidebar {
-    direction: rtl;
+.fi-sidebar-group-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgb(100 116 139);
 }
 
-.fi-topbar {
-    direction: rtl;
+.dark .fi-sidebar-group-label {
+    color: rgb(148 163 184);
 }
 
-/* Hide icons on mobile so they do not obscure the view */
-@media (max-width: 768px) {
-    .fi-header-actions-ctn .fi-icon,
-    .fi-topbar .fi-icon,
-    .fi-topbar-item-icon,
-    .fi-sidebar .fi-icon,
-    .fi-sidebar-item-icon {
-        display: none;
+.fi-sidebar-group-btn .fi-icon,
+.fi-sidebar-group-dropdown-trigger-btn .fi-icon {
+    color: var(--primary-500);
+    opacity: 0.95;
+}
+
+.dark .fi-sidebar-group-btn .fi-icon,
+.dark .fi-sidebar-group-dropdown-trigger-btn .fi-icon {
+    color: var(--primary-400);
+}
+
+.fi-sidebar-item-btn {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+    padding-inline: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.fi-sidebar-item-btn > .fi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--primary-500);
+    opacity: 0.9;
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.dark .fi-sidebar-item-btn > .fi-icon {
+    color: var(--primary-400);
+}
+
+.fi-sidebar-item-btn:hover > .fi-icon {
+    opacity: 1;
+    color: var(--primary-600);
+}
+
+.dark .fi-sidebar-item-btn:hover > .fi-icon {
+    color: var(--primary-300);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon {
+    color: var(--primary-600);
+    opacity: 1;
+}
+
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon {
+    color: var(--primary-300);
+}
+
+.fi-sidebar-item-label {
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 500;
+    color: rgb(51 65 85);
+}
+
+.dark .fi-sidebar-item-label {
+    color: rgb(226 232 240);
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: var(--primary-50);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: rgb(255 255 255 / 0.08);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+}
+
+.fi-sidebar-item-btn:hover {
+    background: rgb(241 245 249);
+}
+
+.dark .fi-sidebar-item-btn:hover {
+    background: rgb(255 255 255 / 0.06);
+}
+
+.fi-sidebar-database-notifications-btn > .fi-icon {
+    color: var(--primary-500);
+    opacity: 0.9;
+}
+
+.dark .fi-sidebar-database-notifications-btn > .fi-icon {
+    color: var(--primary-400);
+}
+
+.fi-sidebar-database-notifications-btn-label {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Mobile: ensure sidebar is completely hidden when closed and overlay when open */
+@media (max-width: 1023px) {
+    .fi-sidebar:not(.fi-sidebar-open) {
+        visibility: hidden !important;
+        pointer-events: none;
     }
+}
+
+/* Dashboard: stats and widgets more colored and readable */
+.fi-wi-stats-overview-widget .fi-wi-stats-overview-stat {
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fi-wi-stats-overview-widget .fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.dark .fi-wi-stats-overview-widget .fi-wi-stats-overview-stat {
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+}
+
+.dark .fi-wi-stats-overview-widget .fi-wi-stats-overview-stat:hover {
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.fi-wi-chart {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.fi-wi-chart .fi-section-content {
+    padding: 1rem;
+}
+
+.fi-wi-table .fi-section-content {
+    padding: 0.5rem;
+}
+
+/* Dashboard: subtle background when widgets are present */
+.fi-main .fi-wi-stats-overview-widget {
+    margin-bottom: 0.5rem;
+}
+
+/* Dashboard welcome header – replace default Dashboard + Account widget */
+.fi-dashboard-welcome {
+    margin-bottom: 1.5rem;
+}
+
+.fi-dashboard-welcome-card {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgb(99 102 241 / 0.12) 0%, rgb(99 102 241 / 0.04) 50%, rgb(139 92 246 / 0.06) 100%);
+    border: 1px solid rgb(99 102 241 / 0.2);
+    padding: 1.5rem 1.75rem;
+    min-height: 7rem;
+}
+
+.dark .fi-dashboard-welcome-card {
+    background: linear-gradient(135deg, rgb(99 102 241 / 0.18) 0%, rgb(99 102 241 / 0.08) 50%, rgb(139 92 246 / 0.1) 100%);
+    border-color: rgb(99 102 241 / 0.3);
+}
+
+.fi-dashboard-welcome-card-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.fi-dashboard-welcome-greeting {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgb(99 102 241);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.dark .fi-dashboard-welcome-greeting {
+    color: rgb(165 180 252);
+}
+
+.fi-dashboard-welcome-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: rgb(30 41 59);
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem 0;
+    line-height: 1.3;
+}
+
+.dark .fi-dashboard-welcome-name {
+    color: rgb(248 250 252);
+}
+
+.fi-dashboard-welcome-date-ctn {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.fi-dashboard-welcome-dayname {
+    font-size: 0.9375rem;
+    color: rgb(100 116 139);
+}
+
+.dark .fi-dashboard-welcome-dayname {
+    color: rgb(148 163 184);
+}
+
+.fi-dashboard-welcome-day {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: rgb(51 65 85);
+}
+
+.dark .fi-dashboard-welcome-day {
+    color: rgb(226 232 240);
+}
+
+.fi-dashboard-welcome-month {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+}
+
+/* Afghan month badge colors – rotate through primary, teal, violet, amber */
+.fi-dashboard-welcome-month-1 { background: rgb(99 102 241); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-2 { background: rgb(20 184 166); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-3 { background: rgb(139 92 246); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-4 { background: rgb(245 158 11); color: rgb(30 41 59); }
+.fi-dashboard-welcome-month-5 { background: rgb(99 102 241); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-6 { background: rgb(34 197 94); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-7 { background: rgb(236 72 153); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-8 { background: rgb(239 68 68); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-9 { background: rgb(14 165 233); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-10 { background: rgb(99 102 241); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-11 { background: rgb(20 184 166); color: rgb(255 255 255); }
+.fi-dashboard-welcome-month-12 { background: rgb(139 92 246); color: rgb(255 255 255); }
+
+.dark .fi-dashboard-welcome-month-4 { color: rgb(255 255 255); }
+
+.fi-dashboard-welcome-year {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: rgb(100 116 139);
+}
+
+.dark .fi-dashboard-welcome-year {
+    color: rgb(148 163 184);
+}
+
+.fi-dashboard-welcome-accent {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40%;
+    max-width: 12rem;
+    height: 100%;
+    background: linear-gradient(105deg, transparent 30%, rgb(99 102 241 / 0.08) 100%);
+    pointer-events: none;
+}
+
+.dark .fi-dashboard-welcome-accent {
+    background: linear-gradient(105deg, transparent 30%, rgb(99 102 241 / 0.12) 100%);
 }

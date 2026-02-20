@@ -16,18 +16,30 @@ final class EditMeeting extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('completePdf')
+                ->label('بشپړ PDF')
+                ->url(fn (): string => route('meetings.pdf.complete', $this->record))
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-document-text')
+                ->color('info'),
             Action::make('decisionsPdf')
                 ->label('د پرېکړو PDF')
                 ->url(fn (): string => route('meetings.pdf.decisions', $this->record))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-document-check')
+                ->color('gray'),
             Action::make('followupPdf')
                 ->label('د تعقيب PDF')
                 ->url(fn (): string => route('meetings.pdf.followup', $this->record))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-clipboard-document-list')
+                ->color('gray'),
             Action::make('shareLink')
                 ->label('د شریکولو لینک')
                 ->url(fn (): string => route('meetings.share.create', $this->record))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-share')
+                ->color('success'),
             DeleteAction::make()->label('ړنګول'),
         ];
     }

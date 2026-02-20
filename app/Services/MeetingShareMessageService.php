@@ -9,38 +9,39 @@ use App\Enums\TaskStatus;
 use App\Models\Meeting;
 use App\Models\MeetingAttendee;
 use App\Models\MeetingTask;
+use BackedEnum;
 
 final class MeetingShareMessageService
 {
-    public function build(Meeting $meeting, string $variant, string $shareUrl): string
+    public function build(Meeting $meeting, string $variant): string
     {
         return match ($variant) {
-            'detailed' => $this->detailed($meeting, $shareUrl),
-            'tasks_only' => $this->tasksOnly($meeting, $shareUrl),
-            'absent_only' => $this->absentOnly($meeting, $shareUrl),
-            'full' => $this->full($meeting, $shareUrl),
-            default => $this->short($meeting, $shareUrl),
+            'detailed' => $this->detailed($meeting),
+            'tasks_only' => $this->tasksOnly($meeting),
+            'absent_only' => $this->absentOnly($meeting),
+            'full' => $this->full($meeting),
+            default => $this->short($meeting),
         };
     }
 
-    public function short(Meeting $meeting, string $shareUrl): string
+    public function short(Meeting $meeting): string
     {
         /** @var \Carbon\Carbon|null $date */
         $date = $meeting->date;
 
         $lines = [
-            '📋 *د مجلس لنډیز*',
+            '*د مجلس لنډیز*',
             '',
             'عنوان: '.$meeting->title,
             'شمېره: '.$meeting->meeting_no,
-            'نېټه: '.($date !== null ? $date->format('Y-m-d') : '-'),
+            'نېټه: '.shamsi_date($date),
             'ځای: '.($meeting->location ?? '-'),
         ];
 
         return implode(PHP_EOL, $lines);
     }
 
-    public function detailed(Meeting $meeting, string $shareUrl): string
+    public function detailed(Meeting $meeting): string
     {
         $openTasksCount = $meeting->tasks()->where('status', '!=', TaskStatus::Done->value)->count();
 
@@ -48,11 +49,11 @@ final class MeetingShareMessageService
         $date = $meeting->date;
 
         $lines = [
-            '📋 *د مجلس تفصیلي لنډیز*',
+            '*د مجلس تفصیلي لنډیز*',
             '',
             'شمېره: '.$meeting->meeting_no,
             'عنوان: '.$meeting->title,
-            'نېټه: '.($date !== null ? $date->format('Y-m-d') : '-'),
+            'نېټه: '.shamsi_date($date),
             'وخت: '.($meeting->time ?? '-'),
             'ځای: '.($meeting->location ?? '-'),
             'ګډونوال: '.$meeting->attendees->count(),
@@ -65,11 +66,11 @@ final class MeetingShareMessageService
         return implode(PHP_EOL, $lines);
     }
 
-    public function tasksOnly(Meeting $meeting, string $shareUrl): string
+    public function tasksOnly(Meeting $meeting): string
     {
         $content = $this->tasksOnlyContent($meeting);
         $lines = [
-            '✅ *د مجلس کارونه*',
+            '*د مجلس کارونه*',
             '',
             $content,
         ];
@@ -77,11 +78,11 @@ final class MeetingShareMessageService
         return implode(PHP_EOL, $lines);
     }
 
-    public function absentOnly(Meeting $meeting, string $shareUrl): string
+    public function absentOnly(Meeting $meeting): string
     {
         $content = $this->absentOnlyContent($meeting);
         $lines = [
-            '👥 *غیر حاضر غړي*',
+            '*غیر حاضر غړي*',
             '',
             $content,
         ];
@@ -89,34 +90,54 @@ final class MeetingShareMessageService
         return implode(PHP_EOL, $lines);
     }
 
-    public function full(Meeting $meeting, string $shareUrl): string
+    public function full(Meeting $meeting): string
     {
         /** @var \Carbon\Carbon|null $date */
         $date = $meeting->date;
         $openTasksCount = $meeting->tasks()->where('status', '!=', TaskStatus::Done->value)->count();
 
         $parts = [
-            '📋 *د مجلس بشپړ لنډیز*',
+            '*د مجلس بشپړ لنډیز*',
             '',
             'شمېره: '.$meeting->meeting_no,
             'عنوان: '.$meeting->title,
-            'نېټه: '.($date !== null ? $date->format('Y-m-d') : '-'),
+            'نېټه: '.shamsi_date($date),
             'وخت: '.($meeting->time ?? '-'),
             'ځای: '.($meeting->location ?? '-'),
             'ګډونوال: '.$meeting->attendees->count(),
             'نا بشپړ کارونه: '.$openTasksCount,
             '',
-            '*پرېکړې:*',
-            $meeting->decisions_text ? mb_trim($meeting->decisions_text) : '—',
         ];
 
-        if (filled($meeting->followup_text)) {
+        if (filled($meeting->agenda)) {
+            $parts[] = '*اجنډا:*';
+            $parts[] = mb_trim($meeting->agenda);
             $parts[] = '';
-            $parts[] = '*تعقيب:*';
-            $parts[] = mb_trim($meeting->followup_text);
         }
 
+        if (filled($meeting->notes)) {
+            $parts[] = '*نوټونه:*';
+            $parts[] = mb_trim($meeting->notes);
+            $parts[] = '';
+        }
+
+        $parts[] = '*پرېکړې:*';
+        $parts[] = $meeting->decisions_text ? mb_trim($meeting->decisions_text) : '—';
         $parts[] = '';
+
+        if (filled($meeting->followup_text)) {
+            $parts[] = '*تعقيب:*';
+            $parts[] = mb_trim($meeting->followup_text);
+            $parts[] = '';
+        }
+
+        $attendeesContent = $this->fullAttendeesContent($meeting);
+        if ($attendeesContent !== '') {
+            $parts[] = '*د مجلس غړي:*';
+            $parts[] = $attendeesContent;
+            $parts[] = '';
+        }
+
         $parts[] = '*کارونه:*';
         $parts[] = $this->tasksOnlyContent($meeting);
 
@@ -130,6 +151,24 @@ final class MeetingShareMessageService
         return implode(PHP_EOL, $parts);
     }
 
+    private function fullAttendeesContent(Meeting $meeting): string
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, MeetingAttendee> $collection */
+        $collection = $meeting->attendees;
+        $lines = $collection
+            ->map(function (MeetingAttendee $attendee): string {
+                $status = $attendee->status;
+                $rawValue = $status instanceof BackedEnum ? $status->value : (string) $status;
+                $statusLabel = AttendanceStatus::tryFrom($rawValue)?->label() ?? $rawValue;
+
+                return '• '.$attendee->display_name.' — '.$statusLabel.($attendee->reason ? ' (علت: '.$attendee->reason.')' : '');
+            })
+            ->values()
+            ->all();
+
+        return $lines === [] ? '—' : implode(PHP_EOL, $lines);
+    }
+
     private function tasksOnlyContent(Meeting $meeting): string
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, MeetingTask> $taskCollection */
@@ -139,10 +178,10 @@ final class MeetingShareMessageService
                 /** @var \Carbon\Carbon|null $dueDate */
                 $dueDate = $task->due_date;
                 $status = $task->status;
-                $rawValue = $status instanceof \BackedEnum ? $status->value : (string) $status;
+                $rawValue = $status instanceof BackedEnum ? $status->value : (string) $status;
                 $statusLabel = TaskStatus::tryFrom($rawValue)?->label() ?? $rawValue;
 
-                return '• '.$task->title.PHP_EOL.'  مسؤل: '.($task->owner ?? '-').' | نېټه: '.($dueDate !== null ? $dueDate->format('Y-m-d') : '-').' | حالت: '.$statusLabel;
+                return '• '.$task->title.PHP_EOL.'  مسؤل: '.($task->owner ?? '-').' | نېټه: '.shamsi_date($dueDate).' | حالت: '.$statusLabel;
             })
             ->values()
             ->all();

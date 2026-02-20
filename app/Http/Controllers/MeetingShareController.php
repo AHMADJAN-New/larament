@@ -42,8 +42,7 @@ final class MeetingShareController extends Controller
         $variant = (string) $request->string('variant', 'short');
         $variant = in_array($variant, $this->variants(), true) ? $variant : 'short';
 
-        $shareUrl = route('meetings.share.show', $shareLink->token);
-        $message = $this->meetingShareMessageService->build($meeting, $variant, $shareUrl);
+        $message = $this->meetingShareMessageService->build($meeting, $variant);
 
         return view('share.meeting', [
             'meeting' => $meeting,
@@ -84,6 +83,24 @@ final class MeetingShareController extends Controller
                 view: 'pdf.meeting-followup',
                 data: ['meeting' => $meeting],
                 downloadName: 'meeting-'.$meeting->meeting_no.'-followup.pdf',
+            );
+        } catch (ProcessFailedException) {
+            return redirect()->route('meetings.share.show', $token)
+                ->with('error', __('PDF generation failed. Install Chrome or set CHROME_PATH in .env.'));
+        }
+    }
+
+    public function complete(string $token): Response|RedirectResponse
+    {
+        $shareLink = $this->resolveShareLink($token);
+        /** @var Meeting $meeting */
+        $meeting = $shareLink->meeting->load(['attendees', 'tasks']);
+
+        try {
+            return $this->chromePdfService->streamFromView(
+                view: 'pdf.meeting-complete',
+                data: ['meeting' => $meeting],
+                downloadName: 'meeting-'.$meeting->meeting_no.'-complete.pdf',
             );
         } catch (ProcessFailedException) {
             return redirect()->route('meetings.share.show', $token)
