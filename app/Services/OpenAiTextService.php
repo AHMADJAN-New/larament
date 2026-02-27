@@ -186,7 +186,7 @@ final class OpenAiTextService
 
             $errorMessageLower = is_string($errorMessage) ? mb_strtolower($errorMessage) : '';
             $errorTypeLower = is_string($errorType) ? mb_strtolower($errorType) : '';
-            $errorCodeLower = is_string($errorCode) ? mb_strtolower((string) $errorCode) : '';
+            $errorCodeLower = is_string($errorCode) ? mb_strtolower($errorCode) : '';
 
             $isQuotaProblem =
                 in_array($errorCodeLower, ['insufficient_quota', 'billing_hard_limit_reached'], true) ||

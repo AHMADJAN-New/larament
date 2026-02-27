@@ -6,18 +6,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Meeting;
 use App\Models\ShareLink;
-use App\Services\ChromePdfService;
 use App\Services\MeetingShareMessageService;
+use App\Services\PdfService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Throwable;
 
 final class MeetingShareController extends Controller
 {
     public function __construct(
-        private readonly ChromePdfService $chromePdfService,
+        private readonly PdfService $pdfService,
         private readonly MeetingShareMessageService $meetingShareMessageService,
     ) {}
 
@@ -61,14 +61,14 @@ final class MeetingShareController extends Controller
         $meeting = $shareLink->meeting->load(['attendees', 'tasks']);
 
         try {
-            return $this->chromePdfService->streamFromView(
+            return $this->pdfService->streamFromView(
                 view: 'pdf.meeting-decisions',
                 data: ['meeting' => $meeting],
                 downloadName: 'meeting-'.$meeting->meeting_no.'-decisions.pdf',
             );
-        } catch (ProcessFailedException) {
+        } catch (Throwable) {
             return redirect()->route('meetings.share.show', $token)
-                ->with('error', __('PDF generation failed. Install Chrome or set CHROME_PATH in .env.'));
+                ->with('error', __('PDF generation failed. Please try again later.'));
         }
     }
 
@@ -79,14 +79,14 @@ final class MeetingShareController extends Controller
         $meeting = $shareLink->meeting->load(['attendees', 'tasks']);
 
         try {
-            return $this->chromePdfService->streamFromView(
+            return $this->pdfService->streamFromView(
                 view: 'pdf.meeting-followup',
                 data: ['meeting' => $meeting],
                 downloadName: 'meeting-'.$meeting->meeting_no.'-followup.pdf',
             );
-        } catch (ProcessFailedException) {
+        } catch (Throwable) {
             return redirect()->route('meetings.share.show', $token)
-                ->with('error', __('PDF generation failed. Install Chrome or set CHROME_PATH in .env.'));
+                ->with('error', __('PDF generation failed. Please try again later.'));
         }
     }
 
@@ -97,14 +97,14 @@ final class MeetingShareController extends Controller
         $meeting = $shareLink->meeting->load(['attendees', 'tasks']);
 
         try {
-            return $this->chromePdfService->streamFromView(
+            return $this->pdfService->streamFromView(
                 view: 'pdf.meeting-complete',
                 data: ['meeting' => $meeting],
                 downloadName: 'meeting-'.$meeting->meeting_no.'-complete.pdf',
             );
-        } catch (ProcessFailedException) {
+        } catch (Throwable) {
             return redirect()->route('meetings.share.show', $token)
-                ->with('error', __('PDF generation failed. Install Chrome or set CHROME_PATH in .env.'));
+                ->with('error', __('PDF generation failed. Please try again later.'));
         }
     }
 

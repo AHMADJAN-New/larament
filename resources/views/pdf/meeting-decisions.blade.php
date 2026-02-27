@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>د مجلس پرېکړې — {{ $meeting->meeting_no }}</title>
-    @include('pdf.partials.fonts-bahij')
     <style>
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
             direction: rtl;
             text-align: right;
             margin: 0;
@@ -22,6 +21,9 @@
             border-bottom: 2px solid #0ea5e9;
             padding-bottom: 1.25rem;
             margin-bottom: 1.5rem;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: embed;
         }
 
         .doc-title {
@@ -29,7 +31,9 @@
             font-size: 22px;
             font-weight: 700;
             color: #0f172a;
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
+            direction: rtl;
+            unicode-bidi: embed;
         }
 
         .meeting-title {
@@ -37,15 +41,35 @@
             font-size: 15px;
             color: #64748b;
             font-weight: 500;
+            direction: rtl;
+            unicode-bidi: embed;
         }
 
         .meta {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.4rem 2.5rem;
             margin-top: 1rem;
             font-size: 12px;
             color: #475569;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: embed;
+        }
+
+        .meta table {
+            width: auto;
+            border: none;
+            margin: 0;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .meta th,
+        .meta td {
+            border: none;
+            padding: 0.2rem 2.5rem 0.2rem 0;
+            background: transparent;
+            font-weight: normal;
+            direction: rtl;
+            text-align: right;
         }
 
         .meta strong {
@@ -58,7 +82,7 @@
             font-weight: 700;
             color: #0f172a;
             margin: 1.25rem 0 0.6rem;
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
         }
 
         table {
@@ -116,16 +140,24 @@
     $absentCount = $meeting->attendees->where('status', \App\Enums\AttendanceStatus::Absent)->count();
 @endphp
 
-<div class="header">
-    <h1 class="doc-title">د مجلس پرېکړې</h1>
-    <p class="meeting-title">{{ $meeting->title }}</p>
-    <div class="meta">
-        <div><strong>شمېره:</strong> {{ $meeting->meeting_no }}</div>
-        <div><strong>نېټه:</strong> {{ shamsi_date($meeting->date) }}</div>
-        <div><strong>وخت:</strong> {{ $meeting->time ?? '—' }}</div>
-        <div><strong>ځای:</strong> {{ $meeting->location ?? '—' }}</div>
-        <div><strong>ټول ګډونوال:</strong> {{ $meeting->attendees->count() }}</div>
-        <div><strong>حاضر:</strong> {{ $presentCount }} | <strong>غیر حاضر:</strong> {{ $absentCount }}</div>
+<div class="header" dir="rtl">
+    <h1 class="doc-title" dir="rtl">د مجلس پرېکړې</h1>
+    <p class="meeting-title" dir="rtl"><span dir="rtl">{{ $meeting->title }}</span></p>
+    <div class="meta" dir="rtl">
+        <table dir="rtl">
+            <tr>
+                <td><span dir="rtl"><strong>شمېره:</strong> {{ $meeting->meeting_no }}</span></td>
+                <td><span dir="rtl"><strong>نېټه:</strong> {{ shamsi_date($meeting->date) }}</span></td>
+            </tr>
+            <tr>
+                <td><span dir="rtl"><strong>وخت:</strong> {{ $meeting->time ?? '—' }}</span></td>
+                <td><span dir="rtl"><strong>ځای:</strong> {{ $meeting->location ?? '—' }}</span></td>
+            </tr>
+            <tr>
+                <td><span dir="rtl"><strong>ټول ګډونوال:</strong> {{ $meeting->attendees->count() }}</span></td>
+                <td><span dir="rtl"><strong>حاضر:</strong> {{ $presentCount }} | <strong>غیر حاضر:</strong> {{ $absentCount }}</span></td>
+            </tr>
+        </table>
     </div>
 </div>
 

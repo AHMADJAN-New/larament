@@ -326,3 +326,29 @@ html.fi {
 .dark .fi-dashboard-welcome-accent {
     background: linear-gradient(105deg, transparent 30%, rgb(99 102 241 / 0.12) 100%);
 }
+
+/* RTL: Pashto / Arabic – align labels and content to the right */
+html.fi[dir="rtl"],
+html.fi[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+}
+
+html.fi[dir="rtl"] .fi-fo-field-wrp-label,
+html.fi[dir="rtl"] .fi-fo-component-ctn,
+html.fi[dir="rtl"] .fi-ta-header-heading,
+html.fi[dir="rtl"] .fi-ta-cell,
+html.fi[dir="rtl"] .fi-in-entry,
+html.fi[dir="rtl"] .fi-section-header-heading,
+html.fi[dir="rtl"] .fi-section-content {
+    text-align: right;
+}
+
+html.fi[dir="rtl"] .fi-fo-field-wrp {
+    text-align: right;
+}
+
+html.fi[dir="rtl"] .fi-sidebar-item-label,
+html.fi[dir="rtl"] .fi-sidebar-group-label {
+    text-align: right;
+}

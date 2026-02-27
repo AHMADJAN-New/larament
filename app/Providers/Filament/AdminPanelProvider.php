@@ -12,6 +12,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -32,7 +33,7 @@ final class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->brandName('مجلس ټریکر پرو+')
+            ->brandName('د مجالسو د تعقیب سیستم')
             ->spa()
             ->profile()
             ->multiFactorAuthentication(
@@ -41,6 +42,16 @@ final class AdminPanelProvider extends PanelProvider
             )
             ->sidebarCollapsibleOnDesktop()
 //            ->topNavigation()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label(__('Language: Pashto'))
+                    ->url(fn (): string => route('locale.switch', ['locale' => 'ps']))
+                    ->sort(-10),
+                MenuItem::make()
+                    ->label(__('Language: English'))
+                    ->url(fn (): string => route('locale.switch', ['locale' => 'en']))
+                    ->sort(-9),
+            ])
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -56,6 +67,7 @@ final class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                \App\Http\Middleware\SetLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,

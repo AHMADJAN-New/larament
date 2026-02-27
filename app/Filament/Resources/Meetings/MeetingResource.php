@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Meetings;
 use App\Filament\Resources\Meetings\Pages\CreateMeeting;
 use App\Filament\Resources\Meetings\Pages\EditMeeting;
 use App\Filament\Resources\Meetings\Pages\ListMeetings;
+use App\Filament\Resources\Meetings\Pages\MeetingsCalendar;
 use App\Filament\Resources\Meetings\Schemas\MeetingForm;
 use App\Filament\Resources\Meetings\Schemas\MeetingInfolist;
 use App\Filament\Resources\Meetings\Tables\MeetingsTable;
@@ -71,6 +72,7 @@ final class MeetingResource extends Resource
     {
         return [
             'index' => ListMeetings::route('/'),
+            'calendar' => MeetingsCalendar::route('/calendar'),
             'create' => CreateMeeting::route('/create'),
             'edit' => EditMeeting::route('/{record}/edit'),
         ];

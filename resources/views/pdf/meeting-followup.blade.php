@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>د تعقيب راپور — {{ $meeting->meeting_no }}</title>
-    @include('pdf.partials.fonts-bahij')
     <style>
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", "DejaVu Sans", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
             direction: rtl;
             text-align: right;
             margin: 0;
@@ -22,6 +21,9 @@
             border-bottom: 2px solid #0ea5e9;
             padding-bottom: 1.25rem;
             margin-bottom: 1.5rem;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: embed;
         }
 
         .doc-title {
@@ -29,7 +31,9 @@
             font-size: 22px;
             font-weight: 700;
             color: #0f172a;
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
+            direction: rtl;
+            unicode-bidi: embed;
         }
 
         .meeting-title {
@@ -37,12 +41,17 @@
             font-size: 15px;
             color: #64748b;
             font-weight: 500;
+            direction: rtl;
+            unicode-bidi: embed;
         }
 
         .meta {
             margin-top: 0.75rem;
             font-size: 12px;
             color: #475569;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: embed;
         }
 
         .meta strong {
@@ -70,7 +79,7 @@
             font-weight: 700;
             color: #0f172a;
             margin: 1.25rem 0 0.6rem;
-            font-family: 'Bahij Nassim', "Noto Naskh Arabic", sans-serif;
+            font-family: {{ $pdfFontFamily ?? 'dejavusans' }}, "DejaVu Sans", sans-serif;
         }
 
         table {
@@ -108,14 +117,11 @@
     </style>
 </head>
 <body>
-<div class="header">
-    <h1 class="doc-title">د تعقيب راپور</h1>
-    <p class="meeting-title">{{ $meeting->title }}</p>
-    <div class="meta">
-        <strong>شمېره:</strong> {{ $meeting->meeting_no }} ·
-        <strong>نېټه:</strong> {{ shamsi_date($meeting->date) }} ·
-        <strong>وخت:</strong> {{ $meeting->time ?? '—' }} ·
-        <strong>ځای:</strong> {{ $meeting->location ?? '—' }}
+<div class="header" dir="rtl">
+    <h1 class="doc-title" dir="rtl">د تعقيب راپور</h1>
+    <p class="meeting-title" dir="rtl"><span dir="rtl">{{ $meeting->title }}</span></p>
+    <div class="meta" dir="rtl">
+        <span dir="rtl"><strong>شمېره:</strong> {{ $meeting->meeting_no }} · <strong>نېټه:</strong> {{ shamsi_date($meeting->date) }} · <strong>وخت:</strong> {{ $meeting->time ?? '—' }} · <strong>ځای:</strong> {{ $meeting->location ?? '—' }}</span>
     </div>
 </div>
 

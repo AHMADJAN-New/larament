@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Meeting;
-use App\Services\ChromePdfService;
+use App\Services\PdfService;
 use Illuminate\Http\Response;
 
 final class MeetingPdfController extends Controller
 {
-    public function __construct(private readonly ChromePdfService $chromePdfService) {}
+    public function __construct(private readonly PdfService $pdfService) {}
 
     public function decisions(Meeting $meeting): Response
     {
@@ -18,7 +18,7 @@ final class MeetingPdfController extends Controller
 
         $meeting->load(['attendees', 'tasks']);
 
-        return $this->chromePdfService->streamFromView(
+        return $this->pdfService->streamFromView(
             view: 'pdf.meeting-decisions',
             data: ['meeting' => $meeting],
             downloadName: 'meeting-'.$meeting->meeting_no.'-decisions.pdf',
@@ -31,7 +31,7 @@ final class MeetingPdfController extends Controller
 
         $meeting->load(['attendees', 'tasks']);
 
-        return $this->chromePdfService->streamFromView(
+        return $this->pdfService->streamFromView(
             view: 'pdf.meeting-followup',
             data: ['meeting' => $meeting],
             downloadName: 'meeting-'.$meeting->meeting_no.'-followup.pdf',
@@ -44,7 +44,7 @@ final class MeetingPdfController extends Controller
 
         $meeting->load(['attendees', 'tasks']);
 
-        return $this->chromePdfService->streamFromView(
+        return $this->pdfService->streamFromView(
             view: 'pdf.meeting-complete',
             data: ['meeting' => $meeting],
             downloadName: 'meeting-'.$meeting->meeting_no.'-complete.pdf',

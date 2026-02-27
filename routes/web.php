@@ -4,9 +4,20 @@ declare(strict_types=1);
 
 use App\Http\Controllers\MeetingPdfController;
 use App\Http\Controllers\MeetingShareController;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
+
+Route::get('/locale/{locale}', function (Request $request, string $locale): RedirectResponse {
+    abort_unless(in_array($locale, ['ps', 'en'], true), 404);
+
+    $request->session()->put('locale', $locale);
+    $request->session()->put('locale_manually_selected', true);
+
+    return redirect()->back();
+})->name('locale.switch');
 
 Route::middleware('auth')->group(function (): void {
     Route::get('/meetings/{meeting}/pdf/decisions', [MeetingPdfController::class, 'decisions'])

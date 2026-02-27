@@ -11,7 +11,7 @@ use Illuminate\Contracts\View\View;
 
 final class Dashboard extends BaseDashboard
 {
-    public function getHeader(): ?View
+    public function getHeader(): View
     {
         $user = Filament::auth()->user();
         $now = Carbon::parse(now()->toDateTimeString());

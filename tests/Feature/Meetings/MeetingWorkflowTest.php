@@ -70,3 +70,18 @@ it('stores meeting attendees and tasks', function () {
         'priority' => TaskPriority::High->value,
     ]);
 });
+
+it('generates followup PDF for authenticated user', function () {
+    $user = User::factory()->create();
+    $meeting = Meeting::factory()->create([
+        'title' => 'د مجلس راپور',
+        'followup_text' => 'تعقيب متن',
+    ]);
+    $meeting->load(['attendees', 'tasks']);
+
+    $response = $this->actingAs($user)->get(route('meetings.pdf.followup', $meeting));
+
+    $response->assertOk();
+    $response->assertHeader('Content-Type', 'application/pdf');
+    $response->assertHeader('Content-Disposition', 'attachment; filename="meeting-'.$meeting->meeting_no.'-followup.pdf"');
+});
