@@ -8,11 +8,11 @@ use App\Enums\AttendanceStatus;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\Attendee;
+use App\Models\MeetingAttendee;
 use App\Models\Template;
 use App\Models\User;
 use App\Services\OpenAiTextService;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -113,32 +113,28 @@ final class MeetingForm
                                             ->label('اجنډا')
                                             ->rows(4)
                                             ->columnSpanFull()
-                                            ->afterLabel(self::makeRefineAction('agenda', 'اجنډا')),
+                                            ->hintAction(self::makeRefineAction('agenda', 'اجنډا')),
                                         Textarea::make('notes')
                                             ->label('نوټونه')
                                             ->rows(4)
                                             ->columnSpanFull()
-                                            ->afterLabel(self::makeRefineAction('notes', 'نوټونه')),
+                                            ->hintAction(self::makeRefineAction('notes', 'نوټونه')),
                                         Textarea::make('decisions_text')
                                             ->label('پرېکړې')
                                             ->rows(6)
                                             ->columnSpanFull()
-                                            ->afterLabel(
-                                                ActionGroup::make([
-                                                    self::makeRefineAction('decisions_text', 'پرېکړې'),
-                                                    self::makeGenerateFromNotesAction('decisions_text', 'پرېکړې'),
-                                                ])->buttonGroup()
-                                            ),
+                                            ->hintActions([
+                                                self::makeRefineAction('decisions_text', 'پرېکړې'),
+                                                self::makeGenerateFromNotesAction('decisions_text', 'پرېکړې'),
+                                            ]),
                                         Textarea::make('followup_text')
                                             ->label('تعقيب')
                                             ->rows(6)
                                             ->columnSpanFull()
-                                            ->afterLabel(
-                                                ActionGroup::make([
-                                                    self::makeRefineAction('followup_text', 'تعقيب', ['agenda', 'notes', 'decisions_text']),
-                                                    self::makeGenerateFromNotesAction('followup_text', 'تعقيب'),
-                                                ])->buttonGroup()
-                                            ),
+                                            ->hintActions([
+                                                self::makeRefineAction('followup_text', 'تعقيب', ['agenda', 'notes', 'decisions_text']),
+                                                self::makeGenerateFromNotesAction('followup_text', 'تعقيب'),
+                                            ]),
                                     ])
                                     ->columns(['default' => 1, 'md' => 2]),
                             ]),
@@ -221,11 +217,22 @@ final class MeetingForm
                                                     ->maxLength(255),
                                                 Select::make('owner')
                                                     ->label('مسؤل')
-                                                    ->options(fn (): array => Attendee::query()
-                                                        ->orderBy('name')
-                                                        ->get()
-                                                        ->mapWithKeys(fn (Attendee $a): array => [$a->display_label => $a->display_label])
-                                                        ->all())
+                                                    ->options(function (Get $get, $record): array {
+                                                        if ($record === null || ! $record->exists) {
+                                                            return [];
+                                                        }
+
+                                                        $meeting = $record->meeting;
+                                                        if ($meeting === null) {
+                                                            return [];
+                                                        }
+
+                                                        return $meeting->attendees()
+                                                            ->orderBy('name')
+                                                            ->get()
+                                                            ->mapWithKeys(fn (MeetingAttendee $a): array => [$a->display_name => $a->display_name])
+                                                            ->all();
+                                                    })
                                                     ->searchable()
                                                     ->nullable(),
                                                 DatePicker::make('due_date')
@@ -244,7 +251,7 @@ final class MeetingForm
                                                     ->label('تشریح')
                                                     ->rows(3)
                                                     ->columnSpanFull()
-                                                    ->afterLabel(self::makeRefineAction('description', 'تشریح', ['agenda', 'notes', 'decisions_text', 'followup_text'])),
+                                                    ->hintAction(self::makeRefineAction('description', 'تشریح', ['agenda', 'notes', 'decisions_text', 'followup_text'])),
                                             ])
                                             ->columns(['default' => 1, 'md' => 2])
                                             ->columnSpanFull(),

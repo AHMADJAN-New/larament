@@ -13,6 +13,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 final class UpcomingMeetingsTableWidget extends TableWidget
 {
@@ -27,6 +28,9 @@ final class UpcomingMeetingsTableWidget extends TableWidget
         return $table
             ->query(
                 Meeting::query()
+                    ->withCount([
+                        'tasks as open_tasks_count' => fn (Builder $query): Builder => $query->where('status', '!=', TaskStatus::Done->value),
+                    ])
                     ->where('date', '>=', now()->toDateString())
                     ->orderBy('date')
                     ->orderBy('time')
@@ -60,10 +64,9 @@ final class UpcomingMeetingsTableWidget extends TableWidget
                     ->label('غړي')
                     ->alignment(Alignment::Center)
                     ->counts('attendees'),
-                TextColumn::make('open_tasks')
+                TextColumn::make('open_tasks_count')
                     ->label('نا بشپړ کارونه')
-                    ->alignment(Alignment::Center)
-                    ->state(fn (Meeting $record): int => $record->tasks()->where('status', '!=', TaskStatus::Done->value)->count()),
+                    ->alignment(Alignment::Center),
             ])
             ->recordActions([
                 ViewAction::make()

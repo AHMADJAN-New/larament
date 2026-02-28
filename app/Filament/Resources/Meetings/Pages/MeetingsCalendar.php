@@ -35,6 +35,15 @@ final class MeetingsCalendar extends Page
 
     public int $totalMeetings = 0;
 
+    public int $daysWithMeetings = 0;
+
+    public int $highestDailyMeetings = 0;
+
+    /**
+     * @var array{id: int, title: string, date_label: string, time_label: string, edit_url: string}|null
+     */
+    public ?array $nextMeeting = null;
+
     protected static string $resource = MeetingResource::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
@@ -174,6 +183,11 @@ final class MeetingsCalendar extends Page
         return MeetingResource::getUrl('index');
     }
 
+    public function getCreateUrl(): string
+    {
+        return MeetingResource::getUrl('create');
+    }
+
     private function normalizePeriod(): void
     {
         $this->month = max(1, min(12, $this->month));
@@ -216,6 +230,26 @@ final class MeetingsCalendar extends Page
                     ->all()
             )
             ->all();
+
+        $dailyCounts = array_map(static fn (array $dayMeetings): int => count($dayMeetings), $meetingsByDate);
+        $this->daysWithMeetings = count($dailyCounts);
+        $this->highestDailyMeetings = $dailyCounts !== [] ? max($dailyCounts) : 0;
+
+        $nextMeeting = Meeting::query()
+            ->whereDate('date', '>=', CarbonImmutable::today()->toDateString())
+            ->orderBy('date')
+            ->orderBy('time')
+            ->first();
+
+        $this->nextMeeting = $nextMeeting instanceof Meeting
+            ? [
+                'id' => $nextMeeting->id,
+                'title' => $nextMeeting->title,
+                'date_label' => shamsi_date($nextMeeting->date->toDateString()),
+                'time_label' => filled($nextMeeting->time) ? Carbon::parse((string) $nextMeeting->time)->format('H:i') : '—',
+                'edit_url' => MeetingResource::getUrl('edit', ['record' => $nextMeeting]),
+            ]
+            : null;
 
         $weeks = [];
         $cursor = $calendarStart;

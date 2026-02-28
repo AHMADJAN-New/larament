@@ -6,10 +6,13 @@ namespace App\Filament\Resources\MeetingTasks\Schemas;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use App\Models\MeetingAttendee;
+use App\Models\MeetingTask;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 final class MeetingTaskForm
@@ -24,15 +27,30 @@ final class MeetingTaskForm
                     ->searchable()
                     ->preload()
                     ->required()
+                    ->live()
                     ->disabled(fn (): bool => auth()->user()?->canEditAnyTask() !== true),
                 TextInput::make('title')
                     ->label('موضوع/دنده')
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn (): bool => auth()->user()?->canEditAnyTask() !== true),
-                TextInput::make('owner')
+                Select::make('owner')
                     ->label('مسؤل')
-                    ->maxLength(255)
+                    ->options(function (Get $get, ?MeetingTask $record): array {
+                        $meetingId = $record?->meeting_id ?? $get('meeting_id');
+                        if (blank($meetingId)) {
+                            return [];
+                        }
+
+                        return MeetingAttendee::query()
+                            ->where('meeting_id', $meetingId)
+                            ->orderBy('name')
+                            ->get()
+                            ->mapWithKeys(fn (MeetingAttendee $a): array => [$a->display_name => $a->display_name])
+                            ->all();
+                    })
+                    ->searchable()
+                    ->nullable()
                     ->disabled(fn (): bool => auth()->user()?->canEditAnyTask() !== true),
                 DatePicker::make('due_date')
                     ->label('وروستۍ نېټه')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Enums\AttendanceStatus;
 use App\Filament\Resources\Meetings\MeetingResource;
 use App\Models\Meeting;
 use DateTimeInterface;
@@ -12,6 +13,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
+use Illuminate\Database\Eloquent\Builder;
 
 final class RecentMeetingsAttendanceTableWidget extends TableWidget
 {
@@ -26,7 +28,11 @@ final class RecentMeetingsAttendanceTableWidget extends TableWidget
         return $table
             ->query(
                 Meeting::query()
-                    ->withCount('attendees')
+                    ->withCount([
+                        'attendees',
+                        'attendees as present_count' => fn (Builder $query): Builder => $query->where('status', AttendanceStatus::Present->value),
+                        'attendees as absent_count' => fn (Builder $query): Builder => $query->where('status', AttendanceStatus::Absent->value),
+                    ])
                     ->orderByDesc('date')
                     ->limit(8)
             )
@@ -54,8 +60,7 @@ final class RecentMeetingsAttendanceTableWidget extends TableWidget
                     ->color('danger'),
                 TextColumn::make('attendees_count')
                     ->label('ټول')
-                    ->alignment(Alignment::Center)
-                    ->counts('attendees'),
+                    ->alignment(Alignment::Center),
             ])
             ->recordActions([
                 ViewAction::make()

@@ -39,6 +39,21 @@ it('auto-generates meeting numbers and stores audit logs', function () {
     ]);
 });
 
+it('continues auto-incrementing after an explicit meeting number', function () {
+    Meeting::query()->create([
+        'meeting_no' => 50,
+        'title' => 'Manual Number Meeting',
+        'date' => now()->toDateString(),
+    ]);
+
+    $nextMeeting = Meeting::query()->create([
+        'title' => 'Auto Number Meeting',
+        'date' => now()->addDay()->toDateString(),
+    ]);
+
+    expect($nextMeeting->meeting_no)->toBe(51);
+});
+
 it('stores meeting attendees and tasks', function () {
     $meeting = Meeting::factory()->create();
 

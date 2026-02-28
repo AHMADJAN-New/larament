@@ -2,12 +2,13 @@
 
 ## Default Admin (Seeder)
 
-The seeder creates one default admin user:
+The seeder creates one admin user for initial access:
 
-- Name: from `DEFAULT_USER_NAME`
-- Email: from `DEFAULT_USER_EMAIL`
-- Password: from `DEFAULT_USER_PASSWORD`
+- Username: `amin`
+- Password: `amin123`
 - Role: `admin`
+
+Log in at `/admin` with **username** and password (not email).
 
 Run:
 

@@ -8,6 +8,7 @@ use App\Models\Meeting;
 use App\Models\ShareLink;
 use App\Services\MeetingShareMessageService;
 use App\Services\PdfService;
+use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,6 +30,10 @@ final class MeetingShareController extends Controller
         $shareLink = $meeting->shareLinks()->create([
             'expires_at' => now()->addDays(7),
         ]);
+
+        if (Filament::auth()->check()) {
+            return redirect()->to(Filament::getUrl().'/share-meeting?token='.urlencode((string) $shareLink->token));
+        }
 
         return redirect()->route('meetings.share.show', $shareLink->token);
     }

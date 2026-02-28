@@ -28,6 +28,9 @@ final class MeetingsTable
     {
         return $table
             ->defaultSort('date', 'desc')
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount([
+                'tasks as open_tasks_count' => fn (Builder $taskQuery): Builder => $taskQuery->where('status', '!=', TaskStatus::Done->value),
+            ]))
             ->columns([
                 TextColumn::make('meeting_no')
                     ->label('شمېره')
@@ -59,8 +62,7 @@ final class MeetingsTable
                     ->counts('attendees'),
                 TextColumn::make('open_tasks_count')
                     ->label('نا بشپړ کارونه')
-                    ->alignment(Alignment::Center)
-                    ->state(fn (Meeting $record): int => $record->tasks()->where('status', '!=', TaskStatus::Done->value)->count()),
+                    ->alignment(Alignment::Center),
                 IconColumn::make('is_confidential')
                     ->label('محرم')
                     ->alignment(Alignment::Center)

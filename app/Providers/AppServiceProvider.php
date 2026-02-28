@@ -32,8 +32,10 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureLocalization(): void
     {
-        App::setLocale(config('app.locale', 'ps'));
-        Date::setLocale(config('app.locale', 'ps'));
+        $locale = config('app.locale', 'ps');
+        $locale = in_array($locale, ['ps', 'en'], true) ? $locale : 'ps';
+        App::setLocale($locale);
+        Date::setLocale($locale);
     }
 
     private function translatableComponents(): void

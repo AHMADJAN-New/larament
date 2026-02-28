@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 final class Meeting extends Model
 {
@@ -77,7 +79,9 @@ final class Meeting extends Model
     {
         self::creating(function (Meeting $meeting): void {
             if (! filled($meeting->meeting_no)) {
-                $meeting->meeting_no = (int) (self::query()->max('meeting_no') ?? 0) + 1;
+                $meeting->meeting_no = self::nextMeetingNumber();
+            } else {
+                self::syncMeetingNumberCounter((int) $meeting->meeting_no);
             }
 
             if (! filled($meeting->created_by)) {
@@ -101,5 +105,70 @@ final class Meeting extends Model
             'date' => 'date',
             'is_confidential' => 'bool',
         ];
+    }
+
+    private static function nextMeetingNumber(): int
+    {
+        if (! Schema::hasTable('meeting_counters')) {
+            return (int) (self::query()->max('meeting_no') ?? 0) + 1;
+        }
+
+        return DB::transaction(function (): int {
+            $counter = DB::table('meeting_counters')
+                ->where('id', 1)
+                ->lockForUpdate()
+                ->first();
+
+            if ($counter === null) {
+                DB::table('meeting_counters')->insert([
+                    'id' => 1,
+                    'last_meeting_no' => (int) (self::query()->max('meeting_no') ?? 0),
+                ]);
+
+                $counter = DB::table('meeting_counters')
+                    ->where('id', 1)
+                    ->lockForUpdate()
+                    ->first();
+            }
+
+            $next = ((int) ($counter->last_meeting_no ?? 0)) + 1;
+
+            DB::table('meeting_counters')
+                ->where('id', 1)
+                ->update(['last_meeting_no' => $next]);
+
+            return $next;
+        });
+    }
+
+    private static function syncMeetingNumberCounter(int $meetingNo): void
+    {
+        if (! Schema::hasTable('meeting_counters')) {
+            return;
+        }
+
+        DB::transaction(function () use ($meetingNo): void {
+            $counter = DB::table('meeting_counters')
+                ->where('id', 1)
+                ->lockForUpdate()
+                ->first();
+
+            if ($counter === null) {
+                DB::table('meeting_counters')->insert([
+                    'id' => 1,
+                    'last_meeting_no' => $meetingNo,
+                ]);
+
+                return;
+            }
+
+            $current = (int) ($counter->last_meeting_no ?? 0);
+
+            if ($meetingNo > $current) {
+                DB::table('meeting_counters')
+                    ->where('id', 1)
+                    ->update(['last_meeting_no' => $meetingNo]);
+            }
+        });
     }
 }

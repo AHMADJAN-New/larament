@@ -26,8 +26,8 @@ test('an unauthenticated user can login', function () {
 
     livewire(Login::class)
         ->fillForm([
-            'email' => config('app.default_user.email'),
-            'password' => config('app.default_user.password'),
+            'username' => 'amin',
+            'password' => 'amin123',
         ])
         ->call('authenticate')
         ->assertHasNoFormErrors();

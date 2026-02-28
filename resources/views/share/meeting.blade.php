@@ -303,15 +303,15 @@
 
         <div class="buttons">
             <button id="copy-button" class="btn" type="button">کاپي</button>
-            <a class="btn btn-primary" href="{{ $whatsAppUrl }}" target="_blank" rel="noopener">په WhatsApp کې شریکول</a>
+            <a class="btn btn-primary" href="{{ $whatsAppUrl }}">په WhatsApp کې شریکول</a>
             <span id="copy-feedback" class="copy-feedback" style="display:none;">کاپي شو</span>
         </div>
 
         <p class="card-desc" style="margin-top:1rem; margin-bottom:0;">د PDF فایلونو لپاره:</p>
         <div class="pdf-row">
-            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.complete', $shareLink->token) }}" target="_blank" rel="noopener">بشپړ PDF</a>
-            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.decisions', $shareLink->token) }}" target="_blank" rel="noopener">د پرېکړو PDF</a>
-            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.followup', $shareLink->token) }}" target="_blank" rel="noopener">د تعقيب PDF</a>
+            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.complete', $shareLink->token) }}">بشپړ PDF</a>
+            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.decisions', $shareLink->token) }}">د پرېکړو PDF</a>
+            <a class="btn btn-pdf" href="{{ route('meetings.share.pdf.followup', $shareLink->token) }}">د تعقيب PDF</a>
         </div>
     </div>
 
@@ -351,7 +351,6 @@
         </table>
     </div>
 </div>
-
 <script>
     const copyButton = document.getElementById('copy-button');
     const shareText = document.getElementById('share-text');
@@ -362,13 +361,17 @@
             await navigator.clipboard.writeText(shareText.value);
             copyFeedback.style.display = 'inline';
             copyFeedback.textContent = 'کاپي شو';
-            const t = setTimeout(() => { copyFeedback.style.display = 'none'; }, 2000);
+            setTimeout(() => {
+                copyFeedback.style.display = 'none';
+            }, 2000);
         } catch (e) {
             shareText.select();
             document.execCommand('copy');
             copyFeedback.style.display = 'inline';
             copyFeedback.textContent = 'کاپي شو';
-            const t = setTimeout(() => { copyFeedback.style.display = 'none'; }, 2000);
+            setTimeout(() => {
+                copyFeedback.style.display = 'none';
+            }, 2000);
         }
     });
 </script>

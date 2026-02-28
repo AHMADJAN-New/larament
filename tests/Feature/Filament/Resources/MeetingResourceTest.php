@@ -3,9 +3,12 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\Meetings\Pages\CreateMeeting;
+use App\Filament\Resources\Meetings\Pages\EditMeeting;
 use App\Filament\Resources\Meetings\Pages\ListMeetings;
 use App\Filament\Resources\Meetings\Pages\MeetingsCalendar;
 use App\Models\Meeting;
+use App\Models\MeetingAttendee;
+use App\Models\MeetingTask;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -49,6 +52,22 @@ it('list table has PDF and share row actions', function () {
 it('can render the create page', function () {
     livewire(CreateMeeting::class)
         ->assertOk();
+});
+
+it('can render the edit page', function () {
+    $meeting = Meeting::factory()->create();
+
+    MeetingAttendee::factory()->create([
+        'meeting_id' => $meeting->getKey(),
+    ]);
+
+    MeetingTask::factory()->create([
+        'meeting_id' => $meeting->getKey(),
+    ]);
+
+    livewire(EditMeeting::class, [
+        'record' => $meeting->getKey(),
+    ])->assertOk();
 });
 
 it('can render meetings calendar page', function () {

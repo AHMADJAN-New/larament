@@ -15,7 +15,8 @@ final class SetLocale
     public function handle(Request $request, Closure $next): Response
     {
         $allowedLocales = ['ps', 'en'];
-        $defaultLocale = config('app.locale', 'ps');
+        $configLocale = config('app.locale', 'ps');
+        $defaultLocale = in_array($configLocale, $allowedLocales, true) ? $configLocale : 'ps';
         $sessionLocale = $request->session()->get('locale');
         $isLocaleManuallySelected = (bool) $request->session()->get('locale_manually_selected', false);
 
